@@ -172,6 +172,97 @@ final _formKey = GlobalKey<FormState>();  // EN: Used to validate the form
                   ),
 
                   SizedBox(height: 10),
+                  // Contrôleur pour stocker le texte sélectionné dans le champ
+TextEditingController _controllerDate = TextEditingController();
+
+// Champ de formulaire pour sélectionner une date
+TextFormField(
+  controller: _controllerDate, // Texte affiché dans le champ
+  decoration: InputDecoration(
+    labelText: "Date de naissance", // Titre du champ
+    border: OutlineInputBorder(),   // Bordure autour du champ
+    suffixIcon: Icon(Icons.calendar_today), // Icône calendrier à droite
+  ),
+  readOnly: true, // On ne peut pas taper dans le champ, seulement sélectionner via calendrier
+  onTap: () async {
+    // Ouvre le sélecteur de date
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),       // Date par défaut affichée
+      firstDate: DateTime(1900),         // Limite inférieure du calendrier
+      lastDate: DateTime(2100),          // Limite supérieure du calendrier
+    );
+
+    if (pickedDate != null) {
+      // Formate la date sélectionnée en texte "jour/mois/année"
+      String formattedDate = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+
+      // Met à jour le champ avec la date sélectionnée
+      setState(() {
+        _controllerDate.text = formattedDate;
+      });
+    }
+  },
+  validator: (value) {
+    // Vérifie que l'utilisateur a bien sélectionné une date
+    if (value == null || value.isEmpty) {
+      return "Veuillez sélectionner une date";
+    }
+    return null; // Pas d'erreur si tout va bien
+  },
+),
+// Variable pour stocker l'image choisie
+File? _image;
+
+// Fonction pour sélectionner une image depuis la galerie
+Future<void> pickImage() async {
+  final ImagePicker picker = ImagePicker(); // Initialise le sélecteur d'image
+  final XFile? image = await picker.pickImage(source: ImageSource.gallery); // Ouvre la galerie
+
+  if (image != null) {
+    // Convertit le fichier choisi en File pour l'afficher
+    setState(() {
+      _image = File(image.path); // Stocke l'image dans la variable _image
+    });
+  }
+}
+
+// Widget pour afficher l'image ou un message si aucune n'est choisie
+Column(
+  children: [
+    _image == null
+        ? Text("Aucune image sélectionnée") // Affiche ce texte si aucune image
+        : Image.file(_image!, height: 150), // Sinon affiche l'image choisie
+    ElevatedButton(
+      onPressed: pickImage, // Lance la fonction pour choisir une image
+      child: Text("Choisir une image"), // Texte du bouton
+    ),
+  ],
+),
+                DropdownButtonFormField<String>(
+                  value:selectedvalue,
+                  hint: Text("choose an option"),
+                  items:["value 1","value 2","value 3"].map((value){
+                    return DropdownMenuItem(
+                      value:value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged:(value){
+                    setState(() {
+                      selectedValue=value;
+                    });
+                    showMessage("Selected: $value");
+                  },
+                   validator: (value) {
+                      if (value == null) {
+                        return "Please select an option";
+                      }
+                      return null;
+                    },
+                ),
+
+                  SizedBox(height: 10),
 
                   /// Email field (example)
                   TextFormField(
@@ -192,7 +283,7 @@ final _formKey = GlobalKey<FormState>();  // EN: Used to validate the form
             /// DropdownButtonFormField = dropdown list
             /// Allows selecting a value from multiple options
             DropdownButtonFormField<String>(
-              value: selectedValue,
+              value: selectedValue2,
               hint: Text("Choose an option"),
               items: ["Option 1", "Option 2", "Option 3"]
                   .map((value) {
@@ -205,7 +296,7 @@ final _formKey = GlobalKey<FormState>();  // EN: Used to validate the form
               /// When the user selects a value
               onChanged: (value) {
                 setState(() {
-                  selectedValue = value;
+                  selectedValue2 = value;
                 });
                 showMessage("Selected: $value");
               },
@@ -226,8 +317,9 @@ final _formKey = GlobalKey<FormState>();  // EN: Used to validate the form
                           String name = _controllername.text;
                           String email = _controlleremail.text;
                           String dropdown = selectedValue!;
+                          String dropdown2 = selectedValue2!;
 
-                          showMessage("Name: $name, Email: $email, Option: $dropdown");
+                          showMessage("Name: $name, Email: $email, Option: $dropdown, Option 2: $dropdown2");
                         }
                       },    
                     child: Text("Submit"),
