@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'add_product_page.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<Home> createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeState extends State<Home> {
 
   List products = [];
 
@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => AddProductPage()),
+            MaterialPageRoute(builder: (_) => Home()),
           );
         },
         child: const Icon(Icons.add),

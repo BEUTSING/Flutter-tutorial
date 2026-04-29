@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,21 +12,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home:  MyHomePage(),
+      home:  Home(),
     );
   }
 }
 
 /// Main page (Stateful to manage form and dropdown)
-class MyHomePage extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeState extends State<Home> {
 
   /// Controller to get the value from the text field
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controllername = TextEditingController();
+  final TextEditingController _controlleremail = TextEditingController();
+final _formKey = GlobalKey<FormState>();  // EN: Used to validate the form  
+
+
+@override
+ void dispose(){
+  _controllername.dispose();
+  _controlleremail.dispose();
+  super.dispose();
+ }
 
   /// Selected value in the dropdown
   String? selectedValue;
@@ -54,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text(
                 "Menu",
                 style: TextStyle(color: Colors.white, fontSize: 24),
+
               ),
             ),
 
@@ -79,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
      
+
 
       /// Main content
       body: SingleChildScrollView(
@@ -137,45 +150,44 @@ class _MyHomePageState extends State<MyHomePage> {
 
             /// Form = container for input fields
             Form(
+              key: _formKey,
               child: Column(
                 children: [
 
                   /// Text field
                   /// You will add validators yourself
                   TextFormField(
-                    controller: _controller,
+                    controller: _controllername,
                     decoration: InputDecoration(
                       labelText: "Name",
                       border: OutlineInputBorder(),
                     ),
+                     validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Enter name";
+                      }
+                      return null;
+                    },      
+                                      
                   ),
 
                   SizedBox(height: 10),
 
                   /// Email field (example)
                   TextFormField(
+                    controller: _controlleremail,
                     decoration: InputDecoration(
                       labelText: "Email",
                       border: OutlineInputBorder(),
                     ),
-                  ),
-
-                  SizedBox(height: 10),
-
-                  /// Submit button (no validation here)
-                  ElevatedButton(
-                    onPressed: () {
-                      showMessage("Form submitted");
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Enter email";
+                      }
+                      return null;
                     },
-                    child: Text("Submit"),
                   ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 20),
-
-            /// ================= DROPDOWN =================
+                   /// ================= DROPDOWN =================
 
             /// DropdownButtonFormField = dropdown list
             /// Allows selecting a value from multiple options
@@ -197,7 +209,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
                 showMessage("Selected: $value");
               },
+               validator: (value) {
+                  if (value == null) {
+                    return "Please select an option";
+                  }
+                  return null;
+                },
             ),
+
+                  SizedBox(height: 10),
+
+                  /// Submit button (no validation here)
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                          String name = _controllername.text;
+                          String email = _controlleremail.text;
+                          String dropdown = selectedValue!;
+
+                          showMessage("Name: $name, Email: $email, Option: $dropdown");
+                        }
+                      },    
+                    child: Text("Submit"),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 20),
+            TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Home()),
+                );
+              },
+              icon: Icon(Icons.home),
+              label: Text("Accueil"),
+            )
           ],
         ),
       ),
